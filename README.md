@@ -30,3 +30,7 @@ This frontend is designed to work with a pre-deployed smart contract. To connect
 2.  **Update the ABI**: If your contract's functions are different, update the ABI in `src/lib/abi.json`.
 
 The application is configured to connect to the Polygon Mumbai testnet, but you can change the network in your MetaMask wallet.
+
+<img width="756" alt="Image" src="https://github.com/user-attachments/assets/b78d76c1-6db6-472c-94c5-b2d579109685" />
+
+<img width="1452" alt="Image" src="https://github.com/user-attachments/assets/c3e96b03-4328-4f6b-b4c4-e872bf0ac9ed" />
