@@ -19,7 +19,7 @@ First, run the development server:
 npm run dev
 ```
 
-Open [http://localhost:9002](http://localhost:9002) with your browser to see the result. You can also visit `/login` to see the login page.
+Open [http://localhost:9002](http://localhost:9002) with your browser to see the result.
 
 ## Smart Contract
 
