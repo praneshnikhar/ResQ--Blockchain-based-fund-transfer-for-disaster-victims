@@ -18,6 +18,24 @@ export default function HomePage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!email.includes('@')) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     if (!password) {
       toast({
@@ -62,7 +80,6 @@ export default function HomePage() {
                 id="email" 
                 type="email" 
                 placeholder="name@example.com" 
-                required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -71,8 +88,8 @@ export default function HomePage() {
               <Label htmlFor="password">Password</Label>
               <Input 
                 id="password" 
-                type="password" 
-                required 
+                type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
