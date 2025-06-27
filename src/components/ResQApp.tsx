@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import abi from '@/lib/abi.json';
 import { CONTRACT_ADDRESS } from '@/lib/constants';
+import Link from 'next/link';
 
 declare global {
   interface Window {
@@ -18,7 +19,7 @@ declare global {
   }
 }
 
-export default function EthDonateApp() {
+export default function ResQApp() {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
   const [account, setAccount] = useState<string | null>(null);
@@ -43,11 +44,11 @@ export default function EthDonateApp() {
         if (accounts.length > 0) {
           const userAccount = accounts[0];
           const web3Signer = web3Provider.getSigner();
-          const ethDonateContract = new ethers.Contract(CONTRACT_ADDRESS, abi, web3Signer);
+          const resqContract = new ethers.Contract(CONTRACT_ADDRESS, abi, web3Signer);
 
           setAccount(userAccount);
           setSigner(web3Signer);
-          setContract(ethDonateContract);
+          setContract(resqContract);
         }
       } catch (error) {
         console.error("Initialization error:", error);
@@ -69,11 +70,11 @@ export default function EthDonateApp() {
         const accounts = await provider.send("eth_requestAccounts", []);
         const userAccount = accounts[0];
         const web3Signer = provider.getSigner();
-        const ethDonateContract = new ethers.Contract(CONTRACT_ADDRESS, abi, web3Signer);
+        const resqContract = new ethers.Contract(CONTRACT_ADDRESS, abi, web3Signer);
 
         setAccount(userAccount);
         setSigner(web3Signer);
-        setContract(ethDonateContract);
+        setContract(resqContract);
         
         toast({
           title: "Wallet Connected",
@@ -133,12 +134,12 @@ export default function EthDonateApp() {
     };
     
     if (window.ethereum) {
-        window.ethereum.on('accountsChanged', handleAccountsChanged);
+        (window.ethereum as any).on('accountsChanged', handleAccountsChanged);
     }
 
     return () => {
-      if (window.ethereum?.removeListener) {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      if ((window.ethereum as any)?.removeListener) {
+        (window.ethereum as any).removeListener('accountsChanged', handleAccountsChanged);
       }
     };
   }, [account, provider]);
@@ -152,24 +153,24 @@ export default function EthDonateApp() {
   
   const handleDonate = async () => {
     if (!contract || !donationAmount || parseFloat(donationAmount) <= 0) {
-      toast({ title: "Donation failed", description: "Please enter a valid amount.", variant: "destructive" });
+      toast({ title: "Support failed", description: "Please enter a valid amount.", variant: "destructive" });
       return;
     }
     try {
       const tx = await contract.donate({ value: ethers.utils.parseEther(donationAmount) });
-      toast({ title: "Processing Donation", description: "Waiting for transaction confirmation..." });
+      toast({ title: "Processing Support", description: "Waiting for transaction confirmation..." });
       await tx.wait();
       toast({
-        title: "Donation Successful!",
-        description: `Thank you for your donation of ${donationAmount} MATIC.`,
-        className: "bg-accent text-accent-foreground",
+        title: "Support Successful!",
+        description: `Thank you for your support of ${donationAmount} MATIC.`,
+        className: "bg-green-100 text-green-800",
       });
       setDonationAmount('');
       getContractBalance();
     } catch (error: any) {
-      console.error("Donation failed:", error);
+      console.error("Support failed:", error);
       const errorMessage = error.data?.message || error.message;
-      toast({ title: "Donation Failed", description: errorMessage, variant: "destructive" });
+      toast({ title: "Support Failed", description: errorMessage, variant: "destructive" });
     }
   };
 
@@ -182,7 +183,7 @@ export default function EthDonateApp() {
       const tx = await contract.verifyRecipient(verifyRecipientAddress);
       toast({ title: "Processing Verification", description: "Waiting for transaction confirmation..." });
       await tx.wait();
-      toast({ title: "Recipient Verified", description: `Address ${verifyRecipientAddress.substring(0, 6)}... has been verified.`, className: "bg-accent text-accent-foreground" });
+      toast({ title: "Recipient Verified", description: `Address ${verifyRecipientAddress.substring(0, 6)}... has been verified.`, className: "bg-green-100 text-green-800" });
       setVerifyRecipientAddress('');
     } catch (error: any) {
       console.error("Verification failed:", error);
@@ -200,7 +201,7 @@ export default function EthDonateApp() {
       const tx = await contract.releaseFunds(releaseRecipientAddress, ethers.utils.parseEther(releaseAmount));
       toast({ title: "Processing Release", description: "Waiting for transaction confirmation..." });
       await tx.wait();
-      toast({ title: "Funds Released", description: `${releaseAmount} MATIC released to ${releaseRecipientAddress.substring(0, 6)}...`, className: "bg-accent text-accent-foreground" });
+      toast({ title: "Funds Released", description: `${releaseAmount} MATIC released to ${releaseRecipientAddress.substring(0, 6)}...`, className: "bg-green-100 text-green-800" });
       setReleaseRecipientAddress('');
       setReleaseAmount('');
       getContractBalance();
@@ -229,7 +230,7 @@ export default function EthDonateApp() {
             <header className="w-full max-w-4xl flex justify-between items-center mb-8">
                 <div className="flex items-center gap-3">
                     <HeartHandshake className="h-8 w-8 text-primary" />
-                    <h1 className="text-3xl md:text-4xl font-headline font-bold">EthDonate</h1>
+                    <h1 className="text-3xl md:text-4xl font-headline font-bold">ResQ</h1>
                 </div>
                 <Skeleton className="h-10 w-40 rounded-md" />
             </header>
@@ -249,20 +250,25 @@ export default function EthDonateApp() {
       <header className="w-full max-w-4xl flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
             <HeartHandshake className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl md:text-4xl font-headline font-bold">EthDonate</h1>
+            <h1 className="text-3xl md:text-4xl font-headline font-bold">ResQ</h1>
         </div>
-        {!account ? (
-          <Button onClick={connectWallet} className="shadow-md transition-transform active:scale-95">
-            <Wallet className="mr-2 h-5 w-5" /> Connect Wallet
-          </Button>
-        ) : (
-          <div className="flex items-center gap-2 p-2 rounded-lg border bg-card text-card-foreground">
-            <span className="font-mono text-sm">{truncatedAccount}</span>
-            <Button variant="ghost" size="icon" onClick={copyAddress} className="h-8 w-8">
-              <Copy className="h-4 w-4" />
+        <div className='flex items-center gap-2'>
+            {!account ? (
+                <Button onClick={connectWallet} className="shadow-md transition-transform active:scale-95">
+                    <Wallet className="mr-2 h-5 w-5" /> Connect Wallet
+                </Button>
+            ) : (
+            <div className="flex items-center gap-2 p-2 rounded-lg border bg-card text-card-foreground">
+                <span className="font-mono text-sm">{truncatedAccount}</span>
+                <Button variant="ghost" size="icon" onClick={copyAddress} className="h-8 w-8">
+                <Copy className="h-4 w-4" />
+                </Button>
+            </div>
+            )}
+             <Button asChild variant="outline">
+                <Link href="/login">Login</Link>
             </Button>
-          </div>
-        )}
+        </div>
       </header>
 
       <main className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -276,7 +282,7 @@ export default function EthDonateApp() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-4xl font-bold font-mono">{parseFloat(contractBalance).toFixed(4)} MATIC</p>
-                    <p className="text-sm text-muted-foreground mt-1">Total funds available for donation.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Total funds available for causes.</p>
                 </CardContent>
             </Card>
         </div>
@@ -285,9 +291,9 @@ export default function EthDonateApp() {
           <CardHeader>
             <div className="flex items-center gap-3">
                 <HeartHandshake className="h-7 w-7 text-primary" />
-                <CardTitle className="text-2xl">Make a Donation</CardTitle>
+                <CardTitle className="text-2xl">Support a Cause</CardTitle>
             </div>
-            <CardDescription>Your contribution makes a difference. Thank you!</CardDescription>
+            <CardDescription>Your contribution can save lives. Thank you!</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Input
@@ -299,7 +305,7 @@ export default function EthDonateApp() {
               className="text-lg"
             />
             <Button onClick={handleDonate} disabled={!account || !donationAmount} className="w-full shadow-md text-lg py-6 transition-transform active:scale-95">
-              Donate Now
+              Support Now
             </Button>
           </CardContent>
         </Card>
@@ -356,7 +362,7 @@ export default function EthDonateApp() {
       </main>
 
       <footer className="w-full max-w-4xl mt-12 text-center text-muted-foreground text-sm">
-        <p>Built with ❤️ for the decentralized world.</p>
+        <p>Empowering communities, one rescue at a time.</p>
         <p>Contract Address: <a href={`https://mumbai.polygonscan.com/address/${CONTRACT_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="font-mono text-primary hover:underline">{CONTRACT_ADDRESS}</a></p>
       </footer>
     </div>

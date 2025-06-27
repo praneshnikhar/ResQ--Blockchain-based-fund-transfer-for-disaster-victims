@@ -1,5 +1,5 @@
-import EthDonateApp from '@/components/EthDonateApp';
+import ResQApp from '@/components/ResQApp';
 
 export default function Home() {
-  return <EthDonateApp />;
+  return <ResQApp />;
 }

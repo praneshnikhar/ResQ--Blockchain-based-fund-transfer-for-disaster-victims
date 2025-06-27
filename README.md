@@ -1,4 +1,4 @@
-# EthDonate DApp
+# ResQ DApp
 
 This is a Next.js frontend for a simple decentralized donation application (DApp) that interacts with a smart contract on an Ethereum-based network.
 
@@ -19,7 +19,7 @@ First, run the development server:
 npm run dev
 ```
 
-Open [http://localhost:9002](http://localhost:9002) with your browser to see the result.
+Open [http://localhost:9002](http://localhost:9002) with your browser to see the result. You can also visit `/login` to see the login page.
 
 ## Smart Contract
 
