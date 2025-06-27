@@ -214,6 +214,21 @@ export default function ResQApp() {
     }
   }, [contract, getContractBalance]);
   
+  const showLatestTransaction = () => {
+    if (transactionHistory.length > 0) {
+      const latestTx = transactionHistory[0];
+      toast({
+        title: "Latest Transaction",
+        description: `Released ${latestTx.amount} MATIC to ${latestTx.to.substring(0, 6)}...`,
+      });
+    } else {
+      toast({
+        title: "No Transactions Yet",
+        description: "No funds have been released to recipients.",
+      });
+    }
+  };
+
   const handleDonate = async () => {
     if (!contract || !donationAmount || parseFloat(donationAmount) <= 0) {
       toast({ title: "Support failed", description: "Please enter a valid amount.", variant: "destructive" });
@@ -390,8 +405,18 @@ export default function ResQApp() {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-4xl font-bold font-mono">{parseFloat(contractBalance).toFixed(4)} MATIC</p>
-                    <p className="text-sm text-muted-foreground mt-1">Total funds available for causes.</p>
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="text-4xl font-bold font-mono">{parseFloat(contractBalance).toFixed(4)} MATIC</p>
+                            <p className="text-sm text-muted-foreground mt-1">Total funds available for causes.</p>
+                        </div>
+                        {account && (
+                            <Button variant="outline" size="sm" onClick={showLatestTransaction}>
+                                <History className="mr-2 h-4 w-4" />
+                                Latest Tx
+                            </Button>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
         </div>
