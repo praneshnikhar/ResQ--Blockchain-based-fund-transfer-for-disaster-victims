@@ -354,10 +354,12 @@ export default function ResQApp() {
                             <Settings className="mr-2 h-4 w-4" />
                             <span>Settings</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsHistoryOpen(true)}>
-                            <History className="mr-2 h-4 w-4" />
-                            <span>History</span>
-                        </DropdownMenuItem>
+                        {isAdmin && (
+                            <DropdownMenuItem onClick={() => setIsHistoryOpen(true)}>
+                                <History className="mr-2 h-4 w-4" />
+                                <span>History</span>
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
                           {theme === 'light' ? (
                             <Moon className="mr-2 h-4 w-4" />
@@ -515,5 +517,3 @@ export default function ResQApp() {
     </div>
   );
 }
-
-    
