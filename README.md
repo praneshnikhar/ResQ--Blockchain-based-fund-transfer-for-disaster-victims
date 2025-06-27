@@ -13,6 +13,7 @@ This is a Next.js frontend for a simple decentralized donation application (DApp
 
 ## Getting Started
 
+
 First, run the development server:
 
 ```bash
