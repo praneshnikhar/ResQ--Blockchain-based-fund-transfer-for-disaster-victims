@@ -52,6 +52,11 @@ export default function ResQApp() {
     setSigner(null);
     setContract(null);
     setIsAdmin(false);
+    try {
+      localStorage.removeItem('userEmail');
+    } catch (error) {
+      console.error("Could not remove userEmail from localStorage", error);
+    }
     toast({ title: 'Signed Out', description: 'You have been successfully signed out.' });
     router.push('/');
   }, [router, toast]);
@@ -137,25 +142,6 @@ export default function ResQApp() {
     }
   }, [provider]);
 
-  const checkAdmin = useCallback(async () => {
-    if (!contract || !account || !provider) return;
-    try {
-      const code = await provider.getCode(CONTRACT_ADDRESS);
-      if (code === '0x') {
-        // Contract not deployed at this address, so can't be admin.
-        setIsAdmin(false);
-        return;
-      }
-      const adminAddress = await contract.admin();
-      setIsAdmin(adminAddress.toLowerCase() === account.toLowerCase());
-    } catch (error) {
-      // This will catch other errors, e.g. if the RPC is down.
-      // The user already sees a console error from ethers, so we can just log for debugging.
-      console.error("Error checking admin status:", error);
-      setIsAdmin(false);
-    }
-  }, [contract, account, provider]);
-
   useEffect(() => {
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
@@ -184,11 +170,21 @@ export default function ResQApp() {
   }, [account, provider, router, toast]);
 
   useEffect(() => {
-    if(contract) {
+    if (contract) {
       getContractBalance();
-      checkAdmin();
     }
-  }, [contract, account, getContractBalance, checkAdmin]);
+    try {
+      const userEmail = localStorage.getItem('userEmail');
+      if (userEmail === 'praneshnikhar@gmail.com') {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    } catch (error) {
+      console.error("Could not read from localStorage to check admin status", error);
+      setIsAdmin(false);
+    }
+  }, [contract, getContractBalance]);
   
   const handleDonate = async () => {
     if (!contract || !donationAmount || parseFloat(donationAmount) <= 0) {
