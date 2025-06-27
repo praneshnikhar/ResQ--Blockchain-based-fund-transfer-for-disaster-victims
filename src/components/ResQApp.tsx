@@ -1,17 +1,27 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { ethers } from 'ethers';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, Coins, Copy, UserCheck, Send, HeartHandshake, Shield } from 'lucide-react';
+import { Wallet, Coins, Copy, UserCheck, Send, HeartHandshake, Shield, User, Settings, LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import abi from '@/lib/abi.json';
 import { CONTRACT_ADDRESS } from '@/lib/constants';
-import Link from 'next/link';
 
 declare global {
   interface Window {
@@ -33,6 +43,16 @@ export default function ResQApp() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const { toast } = useToast();
+  const router = useRouter();
+
+  const handleSignOut = useCallback(() => {
+    setAccount(null);
+    setSigner(null);
+    setContract(null);
+    setIsAdmin(false);
+    toast({ title: 'Signed Out', description: 'You have been successfully signed out.' });
+    router.push('/');
+  }, [router, toast]);
 
   const initEthers = useCallback(async () => {
     if (typeof window.ethereum !== 'undefined') {
@@ -123,6 +143,7 @@ export default function ResQApp() {
       if (accounts.length === 0) {
         setAccount(null); setSigner(null); setContract(null); setIsAdmin(false);
         toast({ title: 'Wallet Disconnected' });
+        router.push('/');
       } else if (accounts[0] !== account) {
         setAccount(accounts[0]);
         if(provider) {
@@ -142,7 +163,7 @@ export default function ResQApp() {
         (window.ethereum as any).removeListener('accountsChanged', handleAccountsChanged);
       }
     };
-  }, [account, provider]);
+  }, [account, provider, router]);
 
   useEffect(() => {
     if(contract) {
@@ -252,22 +273,48 @@ export default function ResQApp() {
             <HeartHandshake className="h-8 w-8 text-primary" />
             <h1 className="text-3xl md:text-4xl font-headline font-bold">ResQ</h1>
         </div>
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-4'>
             {!account ? (
                 <Button onClick={connectWallet} className="shadow-md transition-transform active:scale-95">
                     <Wallet className="mr-2 h-5 w-5" /> Connect Wallet
                 </Button>
             ) : (
-            <div className="flex items-center gap-2 p-2 rounded-lg border bg-card text-card-foreground">
-                <span className="font-mono text-sm">{truncatedAccount}</span>
-                <Button variant="ghost" size="icon" onClick={copyAddress} className="h-8 w-8">
-                <Copy className="h-4 w-4" />
-                </Button>
-            </div>
+            <>
+                <div className="flex items-center gap-2 p-2 rounded-lg border bg-card text-card-foreground">
+                    <span className="font-mono text-sm">{truncatedAccount}</span>
+                    <Button variant="ghost" size="icon" onClick={copyAddress} className="h-8 w-8">
+                        <Copy className="h-4 w-4" />
+                    </Button>
+                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="secondary" size="icon" className="rounded-full">
+                            <Avatar className="h-8 w-8">
+                                <AvatarFallback>{account.substring(2,4).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <span className="sr-only">Toggle user menu</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Profile</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Settings</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSignOut}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Sign out</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </>
             )}
-             <Button asChild variant="outline">
-                <Link href="/login">Login</Link>
-            </Button>
         </div>
       </header>
 
