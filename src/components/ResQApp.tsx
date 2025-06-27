@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, Coins, Copy, UserCheck, Send, HeartHandshake, Shield, User, Settings, LogOut, Sun, Moon } from 'lucide-react';
+import { Wallet, Coins, Copy, UserCheck, Send, HeartHandshake, Shield, User, Settings, LogOut, Sun, Moon, History } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
@@ -18,6 +19,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useTheme } from '@/components/ThemeProvider';
 
@@ -42,6 +59,8 @@ export default function ResQApp() {
   const [releaseAmount, setReleaseAmount] = useState<string>('');
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [transactionHistory, setTransactionHistory] = useState<{ to: string; amount: string; date: string }[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const { theme, setTheme } = useTheme();
 
   const { toast } = useToast();
@@ -90,6 +109,15 @@ export default function ResQApp() {
   useEffect(() => {
     initEthers();
   }, [initEthers]);
+  
+  useEffect(() => {
+    // Mock transaction history for demonstration
+    setTransactionHistory([
+        { to: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8', amount: '0.5', date: new Date(Date.now() - 86400000 * 2).toLocaleString() },
+        { to: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC', amount: '1.2', date: new Date(Date.now() - 86400000 * 5).toLocaleString() },
+    ]);
+  }, []);
+
 
   const connectWallet = async () => {
     if (provider) {
@@ -236,6 +264,12 @@ export default function ResQApp() {
       const tx = await contract.releaseFunds(releaseRecipientAddress, ethers.utils.parseEther(releaseAmount));
       toast({ title: "Processing Release", description: "Waiting for transaction confirmation..." });
       await tx.wait();
+      const newTransaction = {
+        to: releaseRecipientAddress,
+        amount: releaseAmount,
+        date: new Date().toLocaleString(),
+      };
+      setTransactionHistory(prev => [newTransaction, ...prev]);
       toast({ title: "Funds Released", description: `${releaseAmount} MATIC released to ${releaseRecipientAddress.substring(0, 6)}...`, className: "bg-green-100 text-green-800" });
       setReleaseRecipientAddress('');
       setReleaseAmount('');
@@ -319,6 +353,10 @@ export default function ResQApp() {
                         <DropdownMenuItem>
                             <Settings className="mr-2 h-4 w-4" />
                             <span>Settings</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setIsHistoryOpen(true)}>
+                            <History className="mr-2 h-4 w-4" />
+                            <span>History</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
                           {theme === 'light' ? (
@@ -430,6 +468,46 @@ export default function ResQApp() {
         )}
       </main>
 
+      <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Transaction History</DialogTitle>
+            <DialogDescription>
+              A record of all funds released to recipients.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto">
+            <Table>
+              <TableCaption>A list of your recent fund releases.</TableCaption>
+              <TableHeader className="sticky top-0 bg-background">
+                <TableRow>
+                  <TableHead>Recipient</TableHead>
+                  <TableHead>Amount (MATIC)</TableHead>
+                  <TableHead className="text-right">Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {transactionHistory.length > 0 ? (
+                  transactionHistory.map((tx, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-mono">{`${tx.to.substring(0, 6)}...${tx.to.substring(tx.to.length - 4)}`}</TableCell>
+                      <TableCell className="font-mono">{tx.amount}</TableCell>
+                      <TableCell className="text-right">{tx.date}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center h-24">
+                      No transactions yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <footer className="w-full max-w-4xl mt-12 text-center text-muted-foreground text-sm">
         <p>Empowering communities, one rescue at a time.</p>
         <p>Contract Address: <a href={`https://mumbai.polygonscan.com/address/${CONTRACT_ADDRESS}`} target="_blank" rel="noopener noreferrer" className="font-mono text-primary hover:underline">{CONTRACT_ADDRESS}</a></p>
@@ -437,3 +515,5 @@ export default function ResQApp() {
     </div>
   );
 }
+
+    
