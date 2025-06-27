@@ -138,15 +138,23 @@ export default function ResQApp() {
   }, [provider]);
 
   const checkAdmin = useCallback(async () => {
-    if (!contract || !account) return;
+    if (!contract || !account || !provider) return;
     try {
+      const code = await provider.getCode(CONTRACT_ADDRESS);
+      if (code === '0x') {
+        // Contract not deployed at this address, so can't be admin.
+        setIsAdmin(false);
+        return;
+      }
       const adminAddress = await contract.admin();
       setIsAdmin(adminAddress.toLowerCase() === account.toLowerCase());
     } catch (error) {
+      // This will catch other errors, e.g. if the RPC is down.
+      // The user already sees a console error from ethers, so we can just log for debugging.
       console.error("Error checking admin status:", error);
       setIsAdmin(false);
     }
-  }, [contract, account]);
+  }, [contract, account, provider]);
 
   useEffect(() => {
     const handleAccountsChanged = (accounts: string[]) => {
