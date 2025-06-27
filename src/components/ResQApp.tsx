@@ -118,14 +118,14 @@ export default function ResQApp() {
   };
 
   const getContractBalance = useCallback(async () => {
-    if (!contract) return;
+    if (!provider) return;
     try {
-      const balance = await contract.contractBalance();
+      const balance = await provider.getBalance(CONTRACT_ADDRESS);
       setContractBalance(ethers.utils.formatEther(balance));
     } catch (error) {
       console.error("Error fetching contract balance:", error);
     }
-  }, [contract]);
+  }, [provider]);
 
   const checkAdmin = useCallback(async () => {
     if (!contract || !account) return;
@@ -163,7 +163,7 @@ export default function ResQApp() {
         (window.ethereum as any).removeListener('accountsChanged', handleAccountsChanged);
       }
     };
-  }, [account, provider, router]);
+  }, [account, provider, router, toast]);
 
   useEffect(() => {
     if(contract) {
