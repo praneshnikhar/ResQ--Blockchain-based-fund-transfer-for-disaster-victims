@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeartHandshake } from 'lucide-react';
 
-export default function HomePage() {
+export default function SignupPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="w-full max-w-sm mx-4 shadow-lg">
@@ -16,7 +16,7 @@ export default function HomePage() {
             <HeartHandshake className="h-8 w-8 text-primary" />
             <CardTitle className="text-3xl font-bold">ResQ</CardTitle>
           </div>
-          <CardDescription>Login to access your dashboard</CardDescription>
+          <CardDescription>Create an account to get started</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
@@ -28,14 +28,18 @@ export default function HomePage() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Input id="confirm-password" type="password" required />
+            </div>
             <Button asChild className="w-full">
-              <Link href="/dashboard">Login</Link>
+              <Link href="/dashboard">Sign Up</Link>
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline">
-              Sign up
+            Already have an account?{" "}
+            <Link href="/" className="underline">
+              Login
             </Link>
           </div>
         </CardContent>
