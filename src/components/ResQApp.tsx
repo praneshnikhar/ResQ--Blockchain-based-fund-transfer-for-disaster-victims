@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Wallet, Coins, Copy, UserCheck, Send, HeartHandshake, Shield, User, Settings, LogOut } from 'lucide-react';
+import { Wallet, Coins, Copy, UserCheck, Send, HeartHandshake, Shield, User, Settings, LogOut, Sun, Moon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useTheme } from '@/components/ThemeProvider';
 
 import abi from '@/lib/abi.json';
 import { CONTRACT_ADDRESS } from '@/lib/constants';
@@ -41,6 +42,7 @@ export default function ResQApp() {
   const [releaseAmount, setReleaseAmount] = useState<string>('');
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { theme, setTheme } = useTheme();
 
   const { toast } = useToast();
   const router = useRouter();
@@ -124,14 +126,14 @@ export default function ResQApp() {
       const formattedBalance = ethers.utils.formatEther(balance);
       if (parseFloat(formattedBalance) < 0.0001) {
         // For demonstration purposes, show a realistic balance if it's zero.
-        setContractBalance((1 + Math.random()).toFixed(4));
+        setContractBalance('2.1073');
       } else {
         setContractBalance(formattedBalance);
       }
     } catch (error) {
       console.error("Error fetching contract balance:", error);
       // Fallback for demonstration if the balance fetch fails.
-      setContractBalance((1 + Math.random()).toFixed(4));
+      setContractBalance('2.1073');
     }
   }, [provider]);
 
@@ -313,6 +315,14 @@ export default function ResQApp() {
                         <DropdownMenuItem>
                             <Settings className="mr-2 h-4 w-4" />
                             <span>Settings</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+                          {theme === 'light' ? (
+                            <Moon className="mr-2 h-4 w-4" />
+                          ) : (
+                            <Sun className="mr-2 h-4 w-4" />
+                          )}
+                          <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSignOut}>
