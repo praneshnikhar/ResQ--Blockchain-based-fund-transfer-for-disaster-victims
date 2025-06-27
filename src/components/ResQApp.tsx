@@ -109,15 +109,6 @@ export default function ResQApp() {
   useEffect(() => {
     initEthers();
   }, [initEthers]);
-  
-  useEffect(() => {
-    // Mock transaction history for demonstration
-    setTransactionHistory([
-        { to: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8', amount: '0.5', date: new Date(Date.now() - 86400000 * 2).toLocaleString() },
-        { to: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC', amount: '1.2', date: new Date(Date.now() - 86400000 * 5).toLocaleString() },
-    ]);
-  }, []);
-
 
   const connectWallet = async () => {
     if (provider) {
