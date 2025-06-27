@@ -18,6 +18,16 @@ export default function HomePage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!password) {
+      toast({
+        title: "Password Required",
+        description: "Please enter your password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // This is a mock login for demonstration purposes.
     // In a real application, you would use a proper authentication service.
     try {
